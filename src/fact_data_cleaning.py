@@ -65,7 +65,7 @@ financials_df = pd.DataFrame(flattened_data)
 ## Convert data types
 # Define a mapping for data type conversions
 dtype_mapping = {
-    'string': ['entity_name', 'account_name', 'description', 'accession_number', 'fiscal_period', 'form'],
+    'string': ['cik', 'entity_name', 'account_name', 'description', 'accession_number', 'fiscal_period', 'form'],
     'int64': ['fiscal_year'],
     'datetime': ['start_date', 'end_date', 'filed_date']
 }

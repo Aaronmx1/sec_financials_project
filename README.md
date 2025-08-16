@@ -57,3 +57,45 @@ This project automates the extraction, cleaning, and processing of financial dat
 4.  **Data Type Conversion:** Converts columns to appropriate data types, including casting date strings to `datetime` objects and numerical columns to integers or floats.
 5.  **Remove Duplicates:** Removes additional records associated to accession numbers to store only the most recent recorded amount for that account and accession number.
 6.  **Data Storage:** Saves the final, cleaned DataFrame to a compressed Parquet file (.parquet.gzip). This columnar format is optimized for storage and analytical performance, preparing it for the next stage of the data pipeline, such as loading into a data warehouse.
+
+
+### `db_connector.py`
+
+**Overview:** This script creates the connection to our database.
+
+**Process:**
+1.  **Load Environment Variables:** Retrieves environment variables to conceal our database connection details.
+2.  **Create Connection:** Using our environment variables, we create establish a connection to our database and return the connection details, otherwise the program exits during a failed connection.
+
+
+### `data_loader.py`
+
+**Overview:** This script receives the dataset, table name, and the number of attributes defined in the schema in order to flexibly load different datasets.
+
+**Process:**
+1.  **Connect to Database:** Receives connection to database and checks whether connection has been established.
+2.  **Generate SQL:** The SQL script is generated dynamically using our parameters to guide the table and number of attributes to be inserted into.
+3.  **Insert Records:** The batched records are inserted and the connection is closed when the transaction has been completed, otherwise a rollback is performed due to ACID failure.
+
+***
+
+## Database Schema
+
+The project stores the cleaned data in a relational database using a **Star Schema**. This design features a central `fact_financial_reports` table containing quantitative measurements (facts). This fact table is linked to several dimension tables (`dim_submissions`, `dim_accounts`, `dim_forms`), which provide descriptive context.
+
+
+### `create_database.sql`
+
+**Overview:** This script creates the database to store SEC Financials.
+
+**Process:**
+1.  **Create Database:** Generates database structure to maintain tables.
+
+
+### `create_tables.sql`
+
+**Overview:** This script creates multiple tables forming a star schema with the financial values as the fact table and a submissions, accounts, and forms table providing dimensions to the fact table.  A staging table is used to parse data from the fact dataset in order to populate the dimension table before loading in the remaining fact data.
+
+**Process:**
+1.  **Create Table:** Generate dimenions, fact, and a staging table to house the data.
+
