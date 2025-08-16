@@ -41,8 +41,9 @@ This project automates the extraction, cleaning, and processing of financial dat
 1.  **Load Data:** Ingests the `_submission.json` file for a specific CIK.
 2.  **Flatten JSON:** Extracts key-value pairs for company metadata such as CIK, name, ticker, and SIC description.
 3.  **Create DataFrame:** Constructs a pandas DataFrame from the extracted data.
-4.  **Data Typing:** Converts columns to their appropriate data types (e.g., string, integer) for consistency and analysis.
-5.  **Data Storage:** Saves the final, cleaned DataFrame to a compressed Parquet file (.parquet.gzip). This columnar format is optimized for storage and analytical performance, preparing it for the next stage of the data pipeline, such as loading into a data warehouse.
+4.  **Data Type Conversion:** Converts columns to their appropriate data types (e.g., string, integer) for consistency and analysis.
+5.  **Remove Duplicates:** Removes additional records associated to accession numbers to store only the most recent recorded amount for that account and accession number.
+6.  **Data Storage:** Saves the final, cleaned DataFrame to a compressed Parquet file (.parquet.gzip). This columnar format is optimized for storage and analytical performance, preparing it for the next stage of the data pipeline, such as loading into a data warehouse.
 
 
 ### `fact_data_cleaning.py`
@@ -53,5 +54,6 @@ This project automates the extraction, cleaning, and processing of financial dat
 1.  **Load Data:** Ingests the `_facts.json` file.
 2.  **Flatten Nested Facts:** Iterates through the `us-gaap` accounting concepts, extracting the label, description, and all associated financial values reported in 'USD'.
 3.  **Construct DataFrame:** Builds a long-format DataFrame where each row represents a single financial filing for a specific accounting concept.
-4.  **Data Typing:** Converts columns to appropriate data types, including casting date strings to `datetime` objects and numerical columns to integers or floats.
-5.  **Data Storage:** Saves the final, cleaned DataFrame to a compressed Parquet file (.parquet.gzip). This columnar format is optimized for storage and analytical performance, preparing it for the next stage of the data pipeline, such as loading into a data warehouse.
+4.  **Data Type Conversion:** Converts columns to appropriate data types, including casting date strings to `datetime` objects and numerical columns to integers or floats.
+5.  **Remove Duplicates:** Removes additional records associated to accession numbers to store only the most recent recorded amount for that account and accession number.
+6.  **Data Storage:** Saves the final, cleaned DataFrame to a compressed Parquet file (.parquet.gzip). This columnar format is optimized for storage and analytical performance, preparing it for the next stage of the data pipeline, such as loading into a data warehouse.

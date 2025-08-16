@@ -45,6 +45,7 @@ for account, details in us_gaap_facts.items():
                 'entity_name': entity_name,
                 'account_name': account,
                 'description': description,
+                'start_date': entry.get('start'),
                 'end_date': entry.get('end'),
                 'value': entry.get('val'),
                 'accession_number': entry.get('accn'),
@@ -66,7 +67,7 @@ financials_df = pd.DataFrame(flattened_data)
 dtype_mapping = {
     'string': ['entity_name', 'account_name', 'description', 'accession_number', 'fiscal_period', 'form'],
     'int64': ['fiscal_year'],
-    'datetime': ['end_date', 'filed_date']
+    'datetime': ['start_date', 'end_date', 'filed_date']
 }
 
 # Apply data type conversions
@@ -78,11 +79,29 @@ for dtype, columns in dtype_mapping.items():
             financials_df[column] = financials_df[column].astype(dtype)
 
 # Pandas formatting to display more columns
-pd.set_option("display.max_columns", 11)
+pd.set_option("display.max_columns", 13)
 
-# Review final data types
-print(financials_df.info())
-print(financials_df[(financials_df['accession_number'] == '0001193125-10-177386') & (financials_df['account_name'] == 'AccountsPayableCurrent')])
+# Review semi-clean data
+print('\n\n',financials_df.info())
+
+## Remove duplicates
+# Sort by accession_number, then by start_date and end_date from newest to oldest
+financials_df_sorted = financials_df.sort_values(
+    by=['accession_number', 'start_date', 'end_date'],
+    ascending=[True,False,False]
+)
+
+# Define the columns that make a record unique
+subset_cols = ['accession_number', 'account_name']
+
+# Drop duplicates, keeping the first occurrence (which is the latest)
+financials_df_latest = financials_df_sorted.drop_duplicates(
+    subset=subset_cols,
+    keep='first'
+)
+
+# Review cleaned data
+print('\n\n',financials_df_latest.info())
 
 ## Store data
 # Define filename
@@ -92,4 +111,4 @@ file_name = f"{cik}_facts.parquet.gzip"
 full_path = os.path.join(os.getenv("SILVER_DATA"), file_name)
 
 # Save cleaned DataFrame object into Parquet file
-financials_df.to_parquet(full_path, compression='gzip')
+financials_df_latest.to_parquet(full_path, compression='gzip')
