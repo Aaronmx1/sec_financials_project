@@ -77,6 +77,16 @@ This project automates the extraction, cleaning, and processing of financial dat
 2.  **Generate SQL:** The SQL script is generated dynamically using our parameters to guide the table and number of attributes to be inserted into.
 3.  **Insert Records:** The batched records are inserted and the connection is closed when the transaction has been completed, otherwise a rollback is performed due to ACID failure.
 
+
+### `import_parquet.py`
+
+**Overview:** This script serves as the main entry point for loading the cleaned Parquet files into the database. It reads the data, performs any final pre-load transformations, and uses the data_loader module to populate the appropriate tables.
+
+**Process:**
+1.  **Load Parquet File:** Locates and reads a specified .parquet.gzip file from the silver data layer into a pandas DataFrame.
+2.  **Pre-load Transformation:** Handles data type conversions required for database compatibility, specifically converting pandas NaT (Not a Time) values to None so they are inserted as NULL.
+3.  **Load to Database:** Calls the generic load_dataframe_to_db function, passing the DataFrame along with the target table name and a list of columns to be inserted.
+
 ***
 
 ## Database Schema

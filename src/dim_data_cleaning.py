@@ -23,8 +23,8 @@ flattened_data = []
 
 # Add record
 flattened_data.append({
+    'entity_name': raw_data.get("name", {}),
     'cik': raw_data.get("cik", {}),
-    'name': raw_data.get("name", {}),
     'sic_description': raw_data.get("sicDescription", {}),
     'owner_organization': raw_data.get("ownerOrg", {}),
     'ticker': raw_data.get("tickers", {})[0],
@@ -37,7 +37,7 @@ submissions_df = pd.DataFrame(flattened_data)
 ## Convert data types
 # Define a mapping for data conversions
 dtype_mapping = {
-    'string': ['cik', 'name', 'sic_description', 'owner_organization', 'ticker'],
+    'string': ['entity_name', 'cik', 'sic_description', 'owner_organization', 'ticker'],
     'int64': ['ein']
 }
 

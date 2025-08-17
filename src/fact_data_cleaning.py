@@ -82,7 +82,7 @@ for dtype, columns in dtype_mapping.items():
 pd.set_option("display.max_columns", 13)
 
 # Review semi-clean data
-print('\n\n',financials_df.info())
+#print('\n\n',financials_df.info())
 
 ## Remove duplicates
 # Sort by accession_number, then by start_date and end_date from newest to oldest
