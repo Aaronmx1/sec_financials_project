@@ -96,6 +96,15 @@ This project automates the extraction, cleaning, and processing of financial dat
 1.  **Select values:** Select distinct values that will be used to populate dim_accounts.  When a start_date value is NULL then a CASE statment will be used to generate a financial statement classification.
 2.  **Insert into:** Insert the staging table values into the dim_accounts table.
 
+
+### `migrate_staging_to_dim_forms.sql`
+
+**Overview:** This script migrates staging table attributes to the dim_forms table.
+
+**Process:**
+1.  **Select values:** Select distinct values that will be used to populate dim_forms.
+2.  **Insert into:** Insert the staging table values into the dim_forms table.
+
 ***
 
 ## Database Schema
