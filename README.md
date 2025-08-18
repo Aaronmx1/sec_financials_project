@@ -87,6 +87,15 @@ This project automates the extraction, cleaning, and processing of financial dat
 2.  **Pre-load Transformation:** Handles data type conversions required for database compatibility, specifically converting pandas NaT (Not a Time) values to None so they are inserted as NULL.
 3.  **Load to Database:** Calls the generic load_dataframe_to_db function, passing the DataFrame along with the target table name and a list of columns to be inserted.
 
+
+### `migrate_staging_to_dim_accounts.sql`
+
+**Overview:** This script migrates staging table attributes to the dim_accounts table.  During the migration, classifications (Income Statement or Balance Sheet) are assigned to each account.
+
+**Process:**
+1.  **Select values:** Select distinct values that will be used to populate dim_accounts.  When a start_date value is NULL then a CASE statment will be used to generate a financial statement classification.
+2.  **Insert into:** Insert the staging table values into the dim_accounts table.
+
 ***
 
 ## Database Schema
