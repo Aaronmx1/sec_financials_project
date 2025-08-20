@@ -6,6 +6,7 @@ import json
 import pandas as pd
 import pyarrow                  # Required by pandas to write to Parquet format
 from dotenv import load_dotenv
+import re                       # regex
 
 # Load variables from .env
 load_dotenv()
@@ -81,9 +82,6 @@ for dtype, columns in dtype_mapping.items():
 # Pandas formatting to display more columns
 pd.set_option("display.max_columns", 13)
 
-# Review semi-clean data
-#print('\n\n',financials_df.info())
-
 ## Remove duplicates
 # Sort by accession_number, then by start_date and end_date from newest to oldest
 financials_df_sorted = financials_df.sort_values(
@@ -94,14 +92,21 @@ financials_df_sorted = financials_df.sort_values(
 # Define the columns that make a record unique
 subset_cols = ['accession_number', 'account_name']
 
-# Drop duplicates, keeping the first occurrence (which is the latest)
+# Drop duplicates, keeping the first occurrence (which is the latest) and create a new independent DataFrame.
 financials_df_latest = financials_df_sorted.drop_duplicates(
     subset=subset_cols,
     keep='first'
-)
+).copy()
+
+# Enhance readability by adding a space between words in Account Name's
+financials_df_latest['account_name'] = (financials_df_latest['account_name']
+                                        # Insert an empty space whenever a lowercase or number precedes an upper case letter
+                                        .str.replace(r'([a-z0-9])([A-Z])', r'\1 \2', regex=True)
+                                        .str.lower())
 
 # Review cleaned data
 print('\n\n',financials_df_latest.info())
+print("Shape of DataFrame: ", financials_df_latest.shape)
 
 ## Store data
 # Define filename
