@@ -4,6 +4,7 @@ import json
 
 # Third-party imports
 import pandas as pd
+import numpy as np
 import pyarrow                  # Required by pandas to write to Parquet format
 from dotenv import load_dotenv
 import re                       # regex
@@ -78,6 +79,9 @@ for dtype, columns in dtype_mapping.items():
             financials_df[column] = pd.to_datetime(financials_df[column], format="%Y-%m-%d")
         else:
             financials_df[column] = financials_df[column].astype(dtype)
+
+# Pad every CIK in the column with leading zeroes to a length of 10 to match dim_submissions
+financials_df['cik'] = financials_df['cik'].str.zfill(10)
 
 # Pandas formatting to display more columns
 pd.set_option("display.max_columns", 13)

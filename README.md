@@ -30,7 +30,9 @@ This project automates the extraction, cleaning, and processing of financial dat
 
 **Process:**
 1.  **API Request:** Sends a `GET` request to the SEC's EDGAR API (`https://data.sec.gov/api/xbrl/companyfacts/{CIK}.json`).
-2.  *(The rest of the process is identical to the `dim_api_ingestion.py` script).*
+2.  **Authentication:** The request includes a custom `User-Agent` in the header, which is required for programmatic API access. This identifier is loaded from an environment variable for security.
+3.  **Validation & Parsing:** Checks the HTTP status code of the response. If successful (status code 200), it parses the JSON payload into a Python dictionary.
+4.  **Data Storage:** Saves the extracted data as a JSON file to a local directory, with the file path managed via environment variables to avoid hard-coding. If the request fails, an error message is printed.
 
 
 ### `dim_data_cleaning.py`
@@ -42,7 +44,7 @@ This project automates the extraction, cleaning, and processing of financial dat
 2.  **Flatten JSON:** Extracts key-value pairs for company metadata such as CIK, name, ticker, and SIC description.
 3.  **Create DataFrame:** Constructs a pandas DataFrame from the extracted data.
 4.  **Data Type Conversion:** Converts columns to their appropriate data types (e.g., string, integer) for consistency and analysis.
-5.  **Remove Duplicates:** Removes additional records associated to accession numbers to store only the most recent recorded amount for that account and accession number.
+5.  **Ensure Unique Filings:** Ensures a unique record for each company filing by deduplicating the data based on the accession_number.
 6.  **Data Storage:** Saves the final, cleaned DataFrame to a compressed Parquet file (.parquet.gzip). This columnar format is optimized for storage and analytical performance, preparing it for the next stage of the data pipeline, such as loading into a data warehouse.
 
 
@@ -55,8 +57,9 @@ This project automates the extraction, cleaning, and processing of financial dat
 2.  **Flatten Nested Facts:** Iterates through the `us-gaap` accounting concepts, extracting the label, description, and all associated financial values reported in 'USD'.
 3.  **Construct DataFrame:** Builds a long-format DataFrame where each row represents a single financial filing for a specific accounting concept.
 4.  **Data Type Conversion:** Converts columns to appropriate data types, including casting date strings to `datetime` objects and numerical columns to integers or floats.
-5.  **Remove Duplicates:** Removes additional records associated to accession numbers to store only the most recent recorded amount for that account and accession number.
-6.  **Data Storage:** Saves the final, cleaned DataFrame to a compressed Parquet file (.parquet.gzip). This columnar format is optimized for storage and analytical performance, preparing it for the next stage of the data pipeline, such as loading into a data warehouse.
+5.  **Standardize CIK Format:** Pad the attribute `cik` in order to match the submissions and staging table during join.
+6.  **Remove Duplicates:** Removes additional records associated to accession numbers to store only the most recent recorded amount for that account and accession number.
+7.  **Data Storage:** Saves the final, cleaned DataFrame to a compressed Parquet file (.parquet.gzip). This columnar format is optimized for storage and analytical performance, preparing it for the next stage of the data pipeline, such as loading into a data warehouse.
 
 
 ### `db_connector.py`
@@ -64,7 +67,7 @@ This project automates the extraction, cleaning, and processing of financial dat
 **Overview:** This script creates the connection to our database.
 
 **Process:**
-1.  **Load Environment Variables:** Retrieves environment variables to conceal our database connection details.
+1.  **Load Environment Variables:** Retrieve environment variables to conceal our database connection details.
 2.  **Create Connection:** Using our environment variables, we create establish a connection to our database and return the connection details, otherwise the program exits during a failed connection.
 
 
@@ -105,6 +108,15 @@ This project automates the extraction, cleaning, and processing of financial dat
 1.  **Select values:** Select distinct values that will be used to populate dim_forms.
 2.  **Insert into:** Insert the staging table values into the dim_forms table.
 
+
+### `migrate_staging_to_fact_financial_reports.sql`
+
+**Overview:** This script migrates staging table attributes to the fact_financial_reports table.
+
+**Process:**
+1.  **Select values:** Selects all relevant records from the staging table, joining dimension tables to look up the foreign keys (submission_id, account_id, and form_id).
+2.  **Insert into:** Insert the staging table values into the fact_financial_reports table.
+
 ***
 
 ## Database Schema
@@ -125,5 +137,5 @@ The project stores the cleaned data in a relational database using a **Star Sche
 **Overview:** This script creates multiple tables forming a star schema with the financial values as the fact table and a submissions, accounts, and forms table providing dimensions to the fact table.  A staging table is used to parse data from the fact dataset in order to populate the dimension table before loading in the remaining fact data.
 
 **Process:**
-1.  **Create Table:** Generate dimenions, fact, and a staging table to house the data.
+1.  **Create Table:** Generate dimensions, fact, and a staging table to house the data.
 
