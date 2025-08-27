@@ -34,7 +34,6 @@ CREATE TABLE dim_accounts (
 -- Create Forms dimension table
 CREATE TABLE dim_forms (
     form_id INT AUTO_INCREMENT PRIMARY KEY,
-    form_name VARCHAR(20) NOT NULL,
     fiscal_period VARCHAR(5) NOT NULL
 );
 
@@ -47,6 +46,7 @@ CREATE TABLE fact_financial_reports (
     start_date DATE,
     end_date DATE NOT NULL,
     filed_date DATE NOT NULL,
+    fiscal_year INT NOT NULL,
     amount BIGINT NOT NULL,
     FOREIGN KEY (submission_id) REFERENCES dim_submissions(submission_id),
     FOREIGN KEY (account_id) REFERENCES dim_accounts(account_id),
@@ -66,8 +66,8 @@ CREATE TABLE staging_fact_data (
     accession_number VARCHAR(50),
     fiscal_year INT,
     fiscal_period VARCHAR(5),
-    form VARCHAR(20),
-    filed_date DATE
+    filed_date DATE,
+    frame VARCHAR(10)
 );
 
 -- Re-enable commits and foreign key checks

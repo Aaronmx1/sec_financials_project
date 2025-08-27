@@ -35,7 +35,7 @@ def import_submissions_parquet():
     # Import DataFrame into database
     load_dataframe_to_db(df, "dim_submissions", submission_columns)
 
-def import_facts_parquet():
+def import_staging_facts_parquet():
     ''' Imports facts files into staging table.'''
     ## Retrieve data
     # Define filename
@@ -54,7 +54,7 @@ def import_facts_parquet():
     df['start_date'] = df['start_date'].replace({pd.NaT: None})
 
     # Define the columns to be inserted into database
-    fact_columns = [
+    staging_fact_columns = [
         'cik',
         'entity_name',
         'account_name',
@@ -65,13 +65,14 @@ def import_facts_parquet():
         'accession_number',
         'fiscal_year',
         'fiscal_period',
-        'form',
-        'filed_date'
+        #'form',
+        'filed_date',
+        'frame'
     ]
 
     # Import DataFrame into database
-    load_dataframe_to_db(df, "staging_fact_data", fact_columns)
+    load_dataframe_to_db(df, "staging_fact_data", staging_fact_columns)
 
 if __name__ == '__main__':
-    #import_submissions_parquet()
-    import_facts_parquet()
+    import_submissions_parquet()
+    import_staging_facts_parquet()
