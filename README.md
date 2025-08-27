@@ -123,6 +123,8 @@ This project automates the extraction, cleaning, and processing of financial dat
 
 The project stores the cleaned data in a relational database using a **Star Schema**. This design features a central `fact_financial_reports` table containing quantitative measurements (facts). This fact table is linked to several dimension tables (`dim_submissions`, `dim_accounts`, `dim_forms`), which provide descriptive context.
 
+<img width="768" height="817" alt="Schema drawio" src="https://github.com/user-attachments/assets/10a83baa-44d5-4794-bda9-dc9141a72126" />
+
 
 ### `create_database.sql`
 
